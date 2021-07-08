@@ -34,6 +34,32 @@ print(a)
 #[10 20 30 40]
 print(a[b<3]) 
 # 多条件： a[ (a>5) & ( a%2==0)]
+
+#numpy 操作
+
+#在某区间内生成某范围的整数序列
+f = np.random.randint(low=0 , high=10, size=(10), dtype=np.int64)
+
+#在矩阵中随机选点 并给每个店随机取值
+import random
+image = np.zeros((50,50),dtype = np.int)
+x,y = np.where(image <=1)
+numbers = range(0,len(x))
+selected_pos = random.sample(numbers , len(x)//20 )
+# 多维索引 每一位要单独构建一个list
+for i in range(0 , len(selected_pos) ):
+    image[ x[ selected_pos[i] ] ,y[ selected_pos[i] ] ] = random.randint(0,256)
+plt.imshow(image)
+
+#求一个list里元素的平均值
+y,x = np.where(object1 ==colors[1])
+center1_x = int(np.around( np.average(x) ))
+center1_y = int(np.around( np.average(y) ))
+
+#derivative of the 1D array
+derivative = np.diff(x)
+#长度减一
+
 #[10 20 30]
 a=np.array([[1,1],[0,1]])
 b=np.arange(4).reshape((2,2))
