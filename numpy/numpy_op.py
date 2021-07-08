@@ -143,6 +143,8 @@ np.argmin(a)    # 0
 np.argmax(a)    # 11
 np.mean(a)        # 7.5
 np.median(a)       # 7.5
+a.var() #variance
+a.std() # standard variance = sqrt(a.var())
 
 A = np.arange(14,2, -1).reshape((3,4))
 # array([[14, 13, 12, 11],
