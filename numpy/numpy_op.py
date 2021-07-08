@@ -33,6 +33,7 @@ print(b<3)
 print(a)
 #[10 20 30 40]
 print(a[b<3]) 
+print( a[~(a>5)]) 
 # 多条件： a[ (a>5) & ( a%2==0)]
 
 #numpy 操作
