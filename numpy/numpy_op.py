@@ -1,4 +1,14 @@
 # -*- coding: utf-8 -*-
+
+# transpose (a,b,c...) is using the a_th b_th axis as 1st,2nd... axis 
+###################################################################################################
+img_h, img_w = self.obs.shape[1], self.obs.shape[2]
+# (img_c, img_h, img_w, frame_history_len) 
+# transpose is changing the indexing order to (img_h , img_w , img_c , frame_length)
+return self.obs[start_idx:end_idx].transpose(1, 2, 0, 3).reshape(img_h, img_w, -1)
+###################################################################################################
+
+
 import numpy as np
 ###################################################################################################
 #    define matrix
