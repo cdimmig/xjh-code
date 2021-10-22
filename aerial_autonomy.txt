@@ -1,0 +1,194 @@
+###########
+# since the original file is really unfriendly, this file contains every bash cmd you need
+# you should follow the code and the file(I think this is unnecessary)
+# created by Jiahe Xu A.K.A Ale 
+# github 1152802718@qq.com
+###########
+
+
+#in solely aerial_autonomy_ws/src/
+git clone https://github.com/jhu-asco/aerial_autonomy.git
+
+sudo apt-get install lcov protobuf-compiler libprotobuf-dev doxygen doxypy libgoogle-glog-dev ros-melodic-class-loader ros-melodic-ar-track-alvar-msgs autoconf python-pip ros-melodic-serial ros-indigo-map-server libarmadillo-dev
+sudo pip install coverxygen
+
+git clone https://github.com/google/protobuf.git
+cd protobuf
+git checkout v3.0.0
+
+
+# need to change ./autogen.sh according to https://github.com/protocolbuffers/protobuf/commit/bba446bbf2ac7b0b9923d4eb07d5acd0665a8cf0
+./autogen.sh
+./configure
+make
+sudo make install
+sudo ldconfig
+
+
+git  clone https://github.com/google/googletest.git
+cd googletest
+git checkout release-1.8.0
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_GMOCK=ON -DBUILD_GTEST=ON
+make
+sudo make install
+sudo ldconfig
+
+git clone -b hydro-devel https://github.com/jhu-asco/quadcopter_parsers.git
+git clone -b 3.2.3 https://github.com/jhu-asco/Onboard-SDK-ROS.git
+git clone -b hydro-devel https://github.com/jhu-asco/gcop_ros_packages.git
+
+#openCV
+sudo apt-get update -y # Update the list of packages
+sudo apt-get remove -y x264 libx264-dev # Remove the older version of libx264-dev and x264
+sudo apt-get install -y build-essential checkinstall cmake pkg-config yasm
+sudo apt-get install -y git gfortran
+ 
+# The following command will add the link of the repository to install the libraries which does not support 
+# Ubuntu 18.04
+sudo add-apt-repository -y "deb http://security.ubuntu.com/ubuntu xenial-security main"
+sudo apt-get install -y libjpeg8-dev libjasper-dev libpng12-dev
+sudo apt-get install -y libtiff5-dev
+sudo apt-get install -y libavcodec-dev libavformat-dev libswscale-dev libdc1394-22-dev
+sudo apt-get install -y libxine2-dev libv4l-dev
+sudo apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+sudo apt-get install -y qt5-default libgtk2.0-dev libtbb-dev
+sudo apt-get install -y libatlas-base-dev
+sudo apt-get install -y libfaac-dev libmp3lame-dev libtheora-dev
+sudo apt-get install -y libvorbis-dev libxvidcore-dev
+sudo apt-get install -y libopencore-amrnb-dev libopencore-amrwb-dev
+sudo apt-get install -y x264 v4l-utils
+
+sudo apt-get install python3-pip
+sudo pip3 install virtualenv 
+sudo pip3 install virtualenvwrapper
+
+#https://qa.1r1g.com/sf/ask/2422797611/
+mkdir ~/.virtualenvs
+echo "export WORKON_HOME=~/.virtualenvs"  >> ~/.bashrc
+echo "VIRTUALENVWRAPPER_PYTHON='/usr/bin/python3' "  >> ~/.bashrc
+echo "source /usr/local/bin/virtualenvwrapper.sh "  >> ~/.bashrc
+source ~/.bashrc
+
+
+####################################################
+# for the following block, manually enter it into the terminal is a better choice
+####################################################
+mkvirtualenv opencv_source_2 -p python2
+# Activate the environment
+workon opencv_source_2
+# Install the basic libraries
+pip install numpy scipy matplotlib scikit-image scikit-learn ipython 
+# For Python 3
+# Create a virtual environment opencv_source_3
+mkvirtualenv opencv_source_3 -p python3
+# Activate the environment
+workon opencv_source_3
+# Install the basic libraries
+pip install numpy scipy matplotlib scikit-image scikit-learn ipython
+
+
+cd ~/Desktop/
+# Download OpenCV from Github
+git clone https://github.com/opencv/opencv.git
+cd opencv
+git checkout 4.1.0
+cd ..
+# Download OpenCV_contrib from Github
+git clone https://github.com/opencv/opencv_contrib.git
+cd opencv_contrib
+git checkout 4.1.0
+cd ..
+
+####################################################
+# the following block better manually enter terminal
+####################################################
+cd ~/Desktop/opencv
+mkdir build
+cd build
+workon opencv_source_2     # For Python 2
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+      -D CMAKE_INSTALL_PREFIX=/usr/local \
+      -D INSTALL_C_EXAMPLES=ON \
+      -D INSTALL_PYTHON_EXAMPLES=ON \
+      -D WITH_TBB=ON \
+      -D WITH_V4L=ON \
+      -D WITH_QT=ON \
+      -D WITH_OPENGL=ON \
+      -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+      -D BUILD_EXAMPLES=ON \
+      -D OPENCV_GENERATE_PKGCONFIG=YES ..
+workon opencv_source_3     # For Python 3
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+      -D CMAKE_INSTALL_PREFIX=/usr/local \
+      -D INSTALL_C_EXAMPLES=ON \
+      -D INSTALL_PYTHON_EXAMPLES=ON \
+      -D WITH_TBB=ON \
+      -D WITH_V4L=ON \
+      -D WITH_QT=ON \
+      -D WITH_OPENGL=ON \
+      -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+      -D BUILD_EXAMPLES=ON \
+      -D OPENCV_GENERATE_PKGCONFIG=YES ..
+
+
+cd ~/Desktop/opencv/build
+make -j8 
+# Install the library by running the following commands.
+sudo make install
+sudo sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf'
+sudo ldconfig
+
+#########################################
+#Step 9: Modifying opencv4.pc file line 6
+#########################################
+cd ~/Desktop/opencv/build/unix-install/
+gedit opencv4.pc
+includedir_old=${prefix}/include/opencv4/opencv2
+
+cd /usr/local/lib/
+mkdir pkgconfig
+# Move or Copy the opencv4.pc file to the newly created directory
+sudo cp ~/Desktop/opencv/build/unix-install/opencv4.pc /usr/local/lib/pkgconfig/
+
+# Open .bashrc file
+sudo gedit ~/.bashrc
+ 
+# Add the following 2 lines at the end of the file i.e. copy the following lines at the end of .bashrc file.
+PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig
+export PKG_CONFIG_PATH
+
+###############################
+# casadi system, we just want a specific commit
+# you can do this at ~/Desktop
+###############################
+sudo apt-get install gcc g++ gfortran git cmake liblapack-dev pkg-config --install-recommends
+sudo apt-get install swig ipython python-dev python-numpy python-scipy python-matplotlib --install-recommends
+sudo apt-get install spyder
+sudo apt-get install coinor-libipopt-dev
+git clone https://github.com/casadi/casadi.git
+cd casadi
+git checkout 54bde1c242fbb229e05fe87310dce3371b1a4af9
+mkdir build
+cd build
+cmake -DWITH_PYTHON=ON ..
+echo "export PYTHONPATH=:${PYTHONPATH}:/usr/local/lib/python3.6"  >> ~/.bashrc
+cd ~/casadi/build
+make
+sudo make install
+cd .. # Go back to the main casadi source directory
+cd test/python
+python alltests.py  #it should have 0 error and 10-some warning or skip
+
+################
+# in aerial_autonomy_ws/src/
+################
+git clone https://github.com/jhu-asco/gcop.git
+cd gcop
+mkdir build
+cd build
+cmake -DUSE_CASADI=ON ..
+sudo make install
+
+# don't forget to "catkin build" the aerial_autonomy_ws
